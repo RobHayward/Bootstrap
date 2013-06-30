@@ -1,0 +1,28 @@
+data(cars)
+head(cars)
+eq1 <- lm(cars$speed ~ cars$dist)
+summary(eq1)
+myboot <- function(data, stat, nreps, hist = TRUE){
+  estimates <- get(stat)(data)
+  len <- length(estimates)
+  container <- matrix(NA, ncol = len, nrow = nreps)
+  nobs <- nrow(data)
+  for(i in 1:nreps){
+    posdraws <- ceiling(runif(nobs)*nobs)
+    resample <- data[posdraws,]
+    container[i,] <- get(stat)(resample)
+}
+  sds <- apply(container, 2, sd)
+  if(hist == T){
+    mrows = c(1,1)
+    frame()
+    if(len <= 3) par(mfrow = c(len,1))
+    if(len > 3)&(len <= 6)) par(mfrow = c(3,2))
+    for(j in 1:len) hist(container[,j], 
+    main = paste("Estimates for ", names(estimates[j]), 
+                 xlab = "")
+  }
+print(rbind(estimates, sds))
+return(list(estimation = container, sds = sds))
+}
+mod <- myboot(car, "mod", 100, hist = T)
